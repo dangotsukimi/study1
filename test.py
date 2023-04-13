@@ -25,7 +25,8 @@ def login():
         if username != 'admin':
             return redirect(url_for('test', username=username))
 
-        else error='Admin is not allowed.'
+        else :
+            error='Admin is not allowed.'
 
     return render_template('login_form.html', error=error)
 
