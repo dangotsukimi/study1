@@ -19,11 +19,15 @@ def get_test():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error = None
     if request.method == 'POST':
         username = request.form['username']
-        return redirect(url_for('test', username=username))
+        if username != 'admin':
+            return redirect(url_for('test', username=username))
 
-    return render_template('login_form.html')
+        else error='Admin is not allowed.'
+
+    return render_template('login_form.html', error=error)
 
 @app.route('/redirect_test')
 def redirect_test():
