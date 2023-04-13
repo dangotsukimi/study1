@@ -1,7 +1,9 @@
-from flask import Flask, request, redirect, abort, url_for, render_template
+from flask import Flask, request, redirect, abort, url_for, render_template, make_response
 from markupsafe import escape
 
 app = Flask(__name__)
+
+username = None
 
 @app.route('/')
 def index():
@@ -16,15 +18,13 @@ def get_test():
     get_word = request.args.get('name', '1')
     return f"Hello, {get_word}"
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
-        return f"Welcome, {username}"
+        return redirect(url_for('test', username=username))
 
     return render_template('login_form.html')
-
 
 @app.route('/redirect_test')
 def redirect_test():
@@ -33,6 +33,20 @@ def redirect_test():
 @app.route('/error_test')
 def error_test():
     abort(404)
+
+@app.route('/test')
+def test():
+    test_user = request.args.get('username')
+    if test_user is not None :
+        return f"test ok, {test_user}"
+
+    else :
+        return redirect(url_for('login'))
+
+
+
+
+
 
 @app.errorhandler(404)
 def page_not_found(error):
