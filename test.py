@@ -3,7 +3,6 @@ from markupsafe import escape
 
 app = Flask(__name__)
 
-username = None
 
 @app.route('/')
 def index():
