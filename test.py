@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return "<H3>Hello, World!<H3><p>test</p>"
+    return render_template('index.html')
 
 @app.route('/id/<int:id>')
 def hello(id):
