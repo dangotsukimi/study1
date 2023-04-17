@@ -1,8 +1,21 @@
-from flask import Flask, request, redirect, abort, url_for, render_template, make_response
+from flask import Flask, request, redirect, abort, url_for, render_template, make_response, session
 from markupsafe import escape
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 app = Flask(__name__)
+app.secret_key = 'cDe#4RfV'
 
+sql_user = {
+    'user': 'dbuser',
+    'password': 'P@ssw0rd',
+    'host': 'localhost',
+    'database': 'study1'
+}
+
+engine = create_engine("mysql+mysqlconnector://", connect_args=sql_user, echo=True)
+
+db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
 @app.route('/')
 def index():
@@ -21,7 +34,7 @@ def get_test():
 def login():
     error = None
     if request.method == 'POST':
-        username = request.form['username']
+        username = escape(request.form['username'])
         if username != 'admin':
             return redirect(url_for('test', username=username))
 
