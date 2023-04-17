@@ -21,7 +21,7 @@ def get_test():
 def login():
     error = None
     if request.method == 'POST':
-        username = request.form['username']
+        username = escape(request.form['username'])
         if username != 'admin':
             return redirect(url_for('test', username=username))
 
