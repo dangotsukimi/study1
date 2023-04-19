@@ -1,9 +1,12 @@
 {% extends "base.html" %}
-{% block title%} - Login page{% endblock %}
+{% block title%} - Register page{% endblock %}
 {% block body %}
-  <h2>Login</h2>
+  <h2>Register</h2>
   {% if error %}
     <p class=error><strong>Error:</strong> {{ error }}
+  {% endif %}
+  {% if message %}
+    <p class=message>{{ message }}
   {% endif %}
   <form method=post>
     <dl>
@@ -12,6 +15,7 @@
       <dt>Password:
       <dd><input type=password name=password>
     </dl>
-    <p><input type=submit value=Login>
+    <p><input type=submit value=Register>
   </form>
+  <p><a href="login">Login page</a>
 {% endblock %}
