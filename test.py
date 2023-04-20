@@ -98,7 +98,7 @@ def login():
             error='Admin is not allowed.'
 
     if 'logged_in' in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('test'))
 
     return render_template('login_form.html', error=error)
 
