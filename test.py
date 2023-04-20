@@ -1,3 +1,4 @@
+import secrets
 from flask import Flask, request, redirect, abort, url_for, render_template, make_response, session
 from markupsafe import escape
 from sqlalchemy import create_engine, Column, Integer, String
@@ -6,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = 'cDe#4RfV'
+app.secret_key = secrets.token_hex(16)
 
 sql_user = {
     'user': 'dbuser',
@@ -98,7 +99,7 @@ def login():
             error='Admin is not allowed.'
 
     if 'logged_in' in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('test'))
 
     return render_template('login_form.html', error=error)
 
