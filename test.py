@@ -124,5 +124,11 @@ def page_not_found(error):
     return render_template('error.html'), 404
 
 
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()
+
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
