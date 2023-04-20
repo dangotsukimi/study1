@@ -115,7 +115,7 @@ def test():
     if 'logged_in' in session:
         test_user = session['username']
         if test_user is not None:
-            return f"test ok, {test_user}"
+            return render_template('test.html', test_user=test_user)
 
     return redirect(url_for('login'))
 
