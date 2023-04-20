@@ -90,7 +90,9 @@ def login():
                 error = 'Wrong username or password.'
 
             else:
-                return redirect(url_for('test', username=username))
+                session['logged_in'] = True
+                session['username'] = username
+                return redirect(url_for('test'))
 
         else:
             error='Admin is not allowed.'
@@ -107,14 +109,18 @@ def error_test():
 
 @app.route('/test')
 def test():
-    test_user = request.args.get('username')
-    if test_user is not None :
-        return f"test ok, {test_user}"
+    if 'logged_in' in session:
+        test_user = session['username']
+        if test_user is not None:
+            return f"test ok, {test_user}"
+    
+    return redirect(url_for('login'))
 
-    else :
-        return redirect(url_for('login'))
-
-
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    session.pop('username', None)
+    return redirect(url_for('login'))
 
 
 
