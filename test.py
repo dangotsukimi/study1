@@ -97,6 +97,9 @@ def login():
         else:
             error='Admin is not allowed.'
 
+    if 'logged_in' in session:
+        return redirect(url_for('login'))
+
     return render_template('login_form.html', error=error)
 
 @app.route('/redirect_test')
@@ -113,7 +116,7 @@ def test():
         test_user = session['username']
         if test_user is not None:
             return f"test ok, {test_user}"
-    
+
     return redirect(url_for('login'))
 
 @app.route('/logout')
