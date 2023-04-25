@@ -1,4 +1,5 @@
 import secrets
+import re
 from flask import Flask, request, redirect, abort, url_for, render_template, make_response, session
 from markupsafe import escape
 from sqlalchemy import create_engine, Column, Integer, String
@@ -37,6 +38,12 @@ class User(Base):
 
 Base.metadata.create_all(bind=engine)
 
+def is_valid_password(password):
+    pattern = r'^[\w!@#$%&?_]+$'
+    return bool(re.match(pattern, password))
+
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -59,6 +66,13 @@ def register():
         password = request.form['password']
         if not username:
             error = 'Enter username.'
+
+        elif not username.isalnum():
+            error = 'Username can only alphabet or number characters.'
+
+        elif not is_valid_password(password):
+            error = 'Passwords can only contain alphanumeric characters or the following symbols:!@#$%&?_'
+
         elif db_session.query(User).filter_by(username=username).first() is not None:
             error = 'The username is already registered.'
 
@@ -84,9 +98,11 @@ def login():
         elif not username.isalnum():
             error = 'Username can only alphabet or number characters.'
 
+        elif not is_valid_password(password):
+            error = 'Wrong username or password.'
+
         elif username != 'admin':
             user = db_session.query(User).filter_by(username=username).first()
-            print(user.password_hash)
             if not user or not user.check_password(password=password):
                 error = 'Wrong username or password.'
 
