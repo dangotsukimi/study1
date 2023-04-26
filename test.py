@@ -8,13 +8,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://dbuser:P@ssw0rd@localhost/study1'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://dbuser:P%40ssw0rd@localhost/study1'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
 
 class User(db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
