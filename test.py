@@ -51,13 +51,13 @@ def register():
         elif not is_valid_password(password):
             error = 'Passwords can only contain alphanumeric characters or the following symbols:!@#$%&?_'
 
-        elif db_session.query(User).filter_by(username=username).first() is not None:
+        elif User.query.filter_by(username=username).first() is not None:
             error = 'The username is already registered.'
 
         else :
             new_user = User(username=username, password=password)
-            db_session.add(new_user)
-            db_session.commit()
+            db.session.add(new_user)
+            db.session.commit()
             message = 'User has been registered.'
             return render_template('register.html', error=error, message=message)
     return render_template('register.html', error=error, message=message)
@@ -80,7 +80,7 @@ def login():
             error = 'Wrong username or password.'
 
         elif username != 'admin':
-            user = db_session.query(User).filter_by(username=username).first()
+            user = User.query.filter_by(username=username).first()
             if not user or not user.check_password(password=password):
                 error = 'Wrong username or password.'
 
