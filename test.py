@@ -1,31 +1,19 @@
 import secrets
 import re
+from datetime import timedelta
 from flask import Flask, request, redirect, abort, url_for, render_template, make_response, session
 from markupsafe import escape
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
+from models import User, db
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 
+app.permanent_session_lifetime = timedelta(seconds=5)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://dbuser:P%40ssw0rd@localhost/study1'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
-
-
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
-
-    def __init__(self, username=None, password=None):
-        self.username = username
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+db.init_app(app)
 
 def is_valid_password(password):
     pattern = r'^[\w!@#$%&?_]+$'
@@ -86,6 +74,7 @@ def login():
                 error = 'Wrong username or password.'
 
             else:
+                session.permanent = True
                 session['logged_in'] = True
                 session['username'] = username
                 return redirect(url_for('test'))
