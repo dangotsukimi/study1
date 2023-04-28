@@ -1,15 +1,13 @@
 import secrets
 import re
-from datetime import timedelta
+from datetime import timedelta, datetime
 from flask import Flask, request, redirect, abort, url_for, render_template, make_response, session
 from markupsafe import escape
 from models import User, db
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
-
-app.permanent_session_lifetime = timedelta(seconds=5)
-
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=1)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://dbuser:P%40ssw0rd@localhost/study1'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -31,8 +29,8 @@ def register():
     if request.method == 'POST':
         username = escape(request.form['username'])
         password = request.form['password']
-        if not username:
-            error = 'Enter username.'
+        if not username or not password:
+            error = 'Enter both username and password.'
 
         elif not username.isalnum():
             error = 'Username can only alphabet or number characters.'
@@ -74,15 +72,15 @@ def login():
                 error = 'Wrong username or password.'
 
             else:
-                session.permanent = True
-                session['logged_in'] = True
-                session['username'] = username
-                return redirect(url_for('test'))
+                response = make_response(redirect(url_for('test')))
+                expires = datetime.now() + timedelta(minutes=5)
+                response.set_cookie('username', username, expires=expires)
+                return response
 
         else:
             error='Admin is not allowed.'
 
-    if 'logged_in' in session:
+    if request.cookies.get('username'):
         return redirect(url_for('test'))
 
     return render_template('login_form.html', error=error)
@@ -93,18 +91,17 @@ def error_test():
 
 @app.route('/test')
 def test():
-    if 'logged_in' in session:
-        test_user = session['username']
-        if test_user is not None:
-            return render_template('test.html', test_user=test_user)
+    username = request.cookies.get('username')
+    if username is not None:
+        return render_template('test.html', test_user=username)
 
     return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
-    session.pop('logged_in', None)
-    session.pop('username', None)
-    return redirect(url_for('login'))
+    response = make_response(redirect(url_for('login')))
+    response.set_cookie('username', '', expires=0)
+    return response
 
 
 @app.errorhandler(404)
